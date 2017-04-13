@@ -32,6 +32,7 @@ class CBController extends Controller {
 	public $data               = array();
 	public $addaction          = array();
 	public $orderby            = NULL;
+	public $where              = NULL;
 	public $password_candidate = NULL;
 	public $date_candidate     = NULL;
 	public $limit              = 20;
@@ -73,6 +74,19 @@ class CBController extends Controller {
 	public $parent_id 			  = NULL;
 	public $hide_form			  = array();
 	public $index_return 		  = FALSE; //for export
+
+  private function wrapCustomWhere($laravelDbObj) {
+		if(!CRUDBooster::isSuperadmin() AND isset($this->where) AND !empty($this->where)) {
+      $where = $this->where;
+      $sessions = Session::all();
+      foreach($sessions as $key=>$val) {
+        $where = str_replace("[".$key."]", $val, $where);
+      }
+      return $laravelDbObj->whereRaw("({$where})");
+    } else {
+      return $laravelDbObj;
+    }
+  }
 
 
 	public function cbLoader() {
@@ -182,7 +196,7 @@ class CBController extends Controller {
 		$table_columns 	= Cache::remember('columns_'.$this->table,120,function() {
 			return Schema::getColumnListing($this->table);
 		});
-		$result                   = DB::table($this->table)->select(DB::raw($this->table.".".$this->primary_key));
+		$result                   = $this->wrapCustomWhere(DB::table($this->table)->select(DB::raw($this->table.".".$this->primary_key)));
 
 		if(Request::get('parent_id')) {
 			$table_parent = $this->table;
@@ -627,7 +641,7 @@ class CBController extends Controller {
 		$value = Request::get('value');
 		$id = Request::get('id');
 
-		DB::table($table)->where('id',$id)->update([$column => $value]);
+		$this->wrapCustomWhere(DB::table($table)->where('id',$id))->update([$column => $value]);
 
 		return redirect()->back()->with(['message_type'=>'success','message'=>trans('crudbooster.alert_delete_data_success')]);
 	}
@@ -737,7 +751,7 @@ class CBController extends Controller {
 
 			if($di['type'] == 'upload') {
 				if($id) {
-					$row = DB::table($this->table)->where($this->primary_key,$id)->first();
+					$row = $this->wrapCustomWhere(DB::table($this->table)->where($this->primary_key,$id))->first();
 					if($row->{$di['name']}=='') {
 						$ai[] = 'required';
 					}
@@ -1079,7 +1093,7 @@ class CBController extends Controller {
 
 	public function getEdit($id){
 		$this->cbLoader();
-		$row             = DB::table($this->table)->where($this->primary_key,$id)->first();
+		$row             = $this->wrapCustomWhere(DB::table($this->table)->where($this->primary_key,$id))->first();
 
 		if(!CRUDBooster::isRead() && $this->global_privilege==FALSE || $this->button_edit==FALSE) {
 			CRUDBooster::insertLog(trans("crudbooster.log_try_edit",['name'=>$row->{$this->title_field},'module'=>CRUDBooster::getCurrentModule()->name]));
@@ -1096,7 +1110,7 @@ class CBController extends Controller {
 
 	public function postEditSave($id) {
 		$this->cbLoader();
-		$row = DB::table($this->table)->where($this->primary_key,$id)->first();
+		$row = $this->wrapCustomWhere(DB::table($this->table)->where($this->primary_key,$id))->first();
 
 		if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {
 			CRUDBooster::insertLog(trans("crudbooster.log_try_add",['name'=>$row->{$this->title_field},'module'=>CRUDBooster::getCurrentModule()->name]));
@@ -1113,7 +1127,7 @@ class CBController extends Controller {
 
 		$this->hook_before_edit($this->arr,$id);
 		//$this->arr=array_filter($this->arr); // null array fix 
-		DB::table($this->table)->where($this->primary_key,$id)->update($this->arr);		
+		$this->wrapCustomWhere(DB::table($this->table)->where($this->primary_key,$id))->update($this->arr);		
 
 		//Looping Data Input Again After Insert
 		foreach($this->data_inputan as $ro) {
@@ -1176,7 +1190,7 @@ class CBController extends Controller {
 				$childtable = CRUDBooster::parseSqlTable($ro['table'])['table'];
 				$fk = $ro['foreign_key'];
 
-				DB::table($childtable)->where($fk,$id)->delete();
+				DB::table($childtable)->where($this->buildWhereCondition($fk,$id))->delete();
 				$lastId = CRUDBooster::newId($childtable);
 
 				for($i=0;$i<=$count_input_data;$i++) {
@@ -1222,7 +1236,7 @@ class CBController extends Controller {
 
 	public function getDelete($id) {
 		$this->cbLoader();
-		$row = DB::table($this->table)->where($this->primary_key,$id)->first();
+		$row = $this->wrapCustomWhere(DB::table($this->table)->where($this->primary_key,$id))->first();
 
 		if(!CRUDBooster::isDelete() && $this->global_privilege==FALSE || $this->button_delete==FALSE) {
 			CRUDBooster::insertLog(trans("crudbooster.log_try_delete",['name'=>$row->{$this->title_field},'module'=>CRUDBooster::getCurrentModule()->name]));
@@ -1236,9 +1250,9 @@ class CBController extends Controller {
 		$this->hook_before_delete($id);
 
 		if(CRUDBooster::isColumnExists($this->table,'deleted_at')) {
-			DB::table($this->table)->where($this->primary_key,$id)->update(['deleted_at'=>date('Y-m-d H:i:s')]);
+			$this->wrapCustomWhere(DB::table($this->table)->where($this->primary_key,$id))->update(['deleted_at'=>date('Y-m-d H:i:s')]);
 		}else{
-			DB::table($this->table)->where($this->primary_key,$id)->delete();
+			$this->wrapCustomWhere(DB::table($this->table)->where($this->primary_key,$id))->delete();
 		}
 
 
@@ -1251,7 +1265,7 @@ class CBController extends Controller {
 
 	public function getDetail($id)	{
 		$this->cbLoader();
-		$row        = DB::table($this->table)->where($this->primary_key,$id)->first();
+		$row        = $this->wrapCustomWhere(DB::table($this->table)->where($this->primary_key,$id))->first();
 
 		if(!CRUDBooster::isRead() && $this->global_privilege==FALSE || $this->button_detail==FALSE) {
 			CRUDBooster::insertLog(trans("crudbooster.log_try_view",['name'=>$row->{$this->title_field},'module'=>CRUDBooster::getCurrentModule()->name]));
@@ -1474,9 +1488,9 @@ class CBController extends Controller {
 			$this->hook_before_delete($id_selected);
 
 			if(CRUDBooster::isColumnExists($this->table,'deleted_at')) {
-				DB::table($this->table)->whereIn('id',$id_selected)->update(['deleted_at'=>date('Y-m-d H:i:s')]);
+				$this->wrapCustomWhere(DB::table($this->table)->whereIn('id',$id_selected))->update(['deleted_at'=>date('Y-m-d H:i:s')]);
 			}else{
-				DB::table($this->table)->whereIn('id',$id_selected)->delete();
+				$this->wrapCustomWhere(DB::table($this->table)->whereIn('id',$id_selected))->delete();
 			}
 			CRUDBooster::insertLog(trans("crudbooster.log_delete",['name'=>implode(',',$id_selected),'module'=>CRUDBooster::getCurrentModule()->name]));
 
@@ -1499,14 +1513,14 @@ class CBController extends Controller {
 		$id     = Request::get('id');
 		$column = Request::get('column');
 
-		$row    = DB::table($this->table)->where($this->primary_key,$id)->first();
+		$row    = $this->wrapCustomWhere(DB::table($this->table)->where($this->primary_key,$id))->first();
 
 		if(!CRUDBooster::isDelete() && $this->global_privilege==FALSE) {
 			CRUDBooster::insertLog(trans("crudbooster.log_try_delete_image",['name'=>$row->{$this->title_field},'module'=>CRUDBooster::getCurrentModule()->name]));
 			CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
 		}
 
-		$row = DB::table($this->table)->where($this->primary_key,$id)->first();
+		$row = $this->wrapCustomWhere(DB::table($this->table)->where($this->primary_key,$id))->first();
 
 		$file = str_replace('uploads/','',$row->{$column});
 		if(Storage::exists($file)) {
@@ -1516,7 +1530,7 @@ class CBController extends Controller {
        	if(Request::get('temporary')) {
        		CRUDBooster::updateTemporary($this->table,['id'=>$id],[$column=>'']);
        	}else{
-			DB::table($this->table)->where($this->primary_key,$id)->update([$column=>NULL]);
+			$this->wrapCustomWhere(DB::table($this->table)->where($this->primary_key,$id))->update([$column=>NULL]);
        	}
 
 		CRUDBooster::insertLog(trans("crudbooster.log_delete_image",['name'=>$row->{$this->title_field},'module'=>CRUDBooster::getCurrentModule()->name]));
