@@ -440,7 +440,8 @@ class Cms_usersSeeder extends Seeder {
                 'email'             => 'admin@crudbooster.com',
                 'password'          => $password,
                 'id_cms_privileges' => 1,                
-                'status'            =>'Active'
+                'status'            =>'Active',
+                'custom_session_variables' => '{}'
             ));
         }            
 
