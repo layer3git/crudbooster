@@ -25,14 +25,22 @@
 			</div>
 			</div>
 
-			<div class="col-sm-5">
+			<div class="col-sm-2">
 			<div class="form-group">
 				<label>Limit Data</label>
 				<input type="number" name="limit" value="{{$cb_limit}}" class='form-control'>
 			</div>
 			</div>
 
-			<div class="col-sm-7">
+			<div class="col-sm-5">
+			<div class="form-group">
+				<label>Where</label>
+				<input type="text" name="where" value="{{$cb_where}}" class='form-control'>
+				<div class="help-block">E.g : `some_col`='[admin_name]' AND `other_col`='[SESSION_VARIABLE]'</div>
+			</div>
+			</div>
+
+			<div class="col-sm-5">
 			<div class="form-group">
 				<label>Order By</label>
 				<?php 

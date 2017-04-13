@@ -17,18 +17,19 @@ use CRUDBooster;
 
 class ModulsController extends CBController {
 	
-	public function cbInit() {		
+	public function cbInit() {
 		$this->table               = 'cms_moduls';
 		$this->primary_key         = 'id';
 		$this->title_field         = "name";
 		$this->limit               = 100;
-		$this->button_add 		   = false;
+		$this->button_add          = false;
 		$this->button_export       = false;
 		$this->button_import       = false;
 		$this->button_filter       = false;
 		$this->button_detail       = false;
 		$this->button_action_style = 'button_icon';
-		$this->orderby 			   = ['is_protected'=>'asc','name'=>'asc'];
+		$this->orderby             = ['is_protected'=>'asc','name'=>'asc'];
+		$this->where               = '';
 
 		
 		$this->col   = array();		

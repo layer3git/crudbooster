@@ -18,6 +18,7 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 		$this->button_export       = TRUE;
 		$this->limit               = "20";
 		$this->orderby             = "name,asc";
+		$this->where               = "";
 		$this->global_privilege    = FALSE;
 		$this->button_table_action = TRUE;
 		$this->button_bulk_action  = TRUE;

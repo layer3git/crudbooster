@@ -95,7 +95,7 @@ class AdminController extends CBController {
       foreach(preg_split('/[\r\n]+/', $users->custom_session_variables) AS $line) {
         $customSessionVariable = explode(":", $line, 2);
         if(count($customSessionVariable) == 2) {
-          Session::put($customSessionVariable[0], $customSessionVariable[1]);
+          Session::put(trim($customSessionVariable[0]), trim($customSessionVariable[1]));
         }
       }
 
