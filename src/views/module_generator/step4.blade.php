@@ -18,7 +18,14 @@
 	<div class="box-body">
 
 		<div class="row">
-			<div class="col-sm-12">
+			<div class="col-sm-6">
+			<div class="form-group">
+				<label>Primary key</label>
+				<input type="text" name="primary_key" value="{{$cb_primary_key}}" class='form-control'>
+			</div>
+			</div>
+
+			<div class="col-sm-6">
 			<div class="form-group">
 				<label>Title Field Candidate</label>
 				<input type="text" name="title_field" value="{{$cb_title_field}}" class='form-control'>
