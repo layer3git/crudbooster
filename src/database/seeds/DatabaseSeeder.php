@@ -441,7 +441,7 @@ class Cms_usersSeeder extends Seeder {
                 'password'          => $password,
                 'id_cms_privileges' => 1,                
                 'status'            =>'Active',
-                'custom_session_variables' => '{}'
+                'custom_session_variables' => ''
             ));
         }            
 

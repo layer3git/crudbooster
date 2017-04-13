@@ -34,7 +34,7 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 		$this->form[] = array("label"=>"Photo","name"=>"photo","type"=>"upload","help"=>"Recommended resolution is 200x200px",'required'=>true,'validation'=>'required|image|max:1000');											
 		$this->form[] = array("label"=>"Privilege","name"=>"id_cms_privileges","type"=>"select","datatable"=>"cms_privileges,name",'required'=>true);						
 		$this->form[] = array("label"=>"Password","name"=>"password","type"=>"password","help"=>"Please leave empty if not change");
-		$this->form[] = array("label"=>"Custom session variables","name"=>"custom_session_variables","type"=>"text","help"=>"Please insert a valid json object with a list of 'key => string_value' only",'required'=>false,'validation'=>'string|min:0|max:5000');											
+		$this->form[] = array("label"=>"Custom session variables","name"=>"custom_session_variables","type"=>"text","help"=>"Please insert a list of 'key:string_value' one per line",'required'=>false,'validation'=>'string|min:0|max:5000');											
 		# END FORM DO NOT REMOVE THIS LINE
 				
 	}
