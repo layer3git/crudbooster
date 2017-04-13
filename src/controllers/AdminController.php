@@ -94,8 +94,8 @@ class AdminController extends CBController {
 			Session::put("appname",CRUDBooster::getSetting('appname'));		
       foreach(preg_split('/[\r\n]+/', $users->custom_session_variables) AS $line) {
         $customSessionVariable = explode(":", $line, 2);
-        if(count($line) == 2) {
-          Session::put($line[0], $line[1]);
+        if(count($customSessionVariable) == 2) {
+          Session::put($customSessionVariable[0], $customSessionVariable[1]);
         }
       }
 
