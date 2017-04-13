@@ -92,6 +92,12 @@ class AdminController extends CBController {
 			Session::put('admin_lock',0);
 			Session::put('theme_color',$priv->theme_color);
 			Session::put("appname",CRUDBooster::getSetting('appname'));		
+      foreach(preg_split('/[\r\n]+/', $users->custom_session_variables) AS $line) {
+        $customSessionVariable = explode(":", $line, 2);
+        if(count($line) == 2) {
+          Session::put($line[0], $line[1]);
+        }
+      }
 
 			CRUDBooster::insertLog(trans("crudbooster.log_login",['email'=>$users->email,'ip'=>Request::server('REMOTE_ADDR')]));		
 
