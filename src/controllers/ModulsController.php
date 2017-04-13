@@ -514,8 +514,8 @@ class ModulsController extends CBController {
 			$response     = file_get_contents(app_path('Http/Controllers/'.$row->controller.'.php'));
 			$column_datas = extract_unit($response,"# START CONFIGURATION DO NOT REMOVE THIS LINE","# END CONFIGURATION DO NOT REMOVE THIS LINE");			
 			$column_datas = str_replace('$this->','$data[\'cb_', $column_datas);			
-			$column_datas = str_replace(' = ','\'] = ', $column_datas);			
-			$column_datas = str_replace([' ',"\t"],'', $column_datas);			
+			$column_datas = str_replace(' = ','\']=', $column_datas);			
+			$column_datas = str_replace("\t",'', $column_datas);			
 			eval($column_datas);
 		}
 
@@ -538,16 +538,16 @@ class ModulsController extends CBController {
 			if(in_array($key, $exception)) continue;		
 
 			if($val != 'true' && $val != 'false') {
-				$value = '"'.$val.'"';
+				$value = '"'.trim($val).'"';
 			}else{
-				$value = $val;
+				$value = trim($val);
 			}
 
 			// if($key == 'orderby') {
 			// 	$value = ;
 			// }
 
-			$script_config[$i] = "\t\t\t".'$this->'.$key.' = '.$value.';';
+			$script_config[$i] = "\t\t\t".'$this->'.$key.' = '.trim($value).';';
 			$i++;
 		}	
 
