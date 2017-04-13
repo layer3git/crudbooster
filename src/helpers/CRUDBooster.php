@@ -802,7 +802,7 @@ class CRUDBooster  {
 		        }
 	        }else{
 	        	try{	        		
-		        	$tables = DB::select("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.Tables WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = '".$db_database."'");		        	
+		        	$tables = DB::select("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.Tables WHERE (TABLE_TYPE = 'BASE TABLE' OR TABLE_TYPE = 'VIEW') AND TABLE_SCHEMA = '".$db_database."'");		        	
 	        	}catch(\Exception $e) {
 	        		$tables = [];
 	        	}
