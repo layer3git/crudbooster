@@ -37,6 +37,7 @@ class CBController extends Controller {
 	public $date_candidate     = NULL;
 	public $limit              = 20;
 	public $global_privilege   = FALSE;
+	public $show_numbering	   = FALSE;
 
 	public $alert                 = array();
 	public $index_button          = array();
@@ -104,6 +105,7 @@ class CBController extends Controller {
 		$this->data['appname']               = CRUDBooster::getSetting('appname');
 		$this->data['alerts']                = $this->alert;
 		$this->data['index_button']          = $this->index_button;
+		$this->data['show_numbering']	     = $this->show_numbering;
 		$this->data['button_detail']         = $this->button_detail;
 		$this->data['button_edit']           = $this->button_edit;
 		$this->data['button_show']           = $this->button_show;
@@ -442,10 +444,19 @@ class CBController extends Controller {
 		$orig_mainpath = $this->data['mainpath'];
 		$title_field   = $this->title_field;
 		$html_contents = array();
+		$page = (Request::get('page'))?Request::get('page'):1; 
+		$number = ($page-1)*$limit+1; 
 		foreach($data['result'] as $row) {
 			$html_content = array();
 
-			$html_content[] = "<input type='checkbox' class='checkbox' name='checkbox[]' value='$row->id'/>";
+			if($this->button_bulk_action) {				
+				$html_content[] = "<input type='checkbox' class='checkbox' name='checkbox[]' value='$row->id'/>";
+			}
+
+			if($this->show_numbering) {
+				$html_content[] = $number.'. ';
+				$number++;
+			}
 
 			foreach($columns_table as $col) {
 		          if($col['visible']===FALSE) continue;		          
@@ -983,17 +994,15 @@ class CBController extends Controller {
 		$this->validation();
 		$this->input_assignment();		
 
-		if (CRUDBooster::isColumnExists($this->table, 'created_at'))
+		if(Schema::hasColumn($this->table, 'created_at'))
 		{
 		    $this->arr['created_at'] = date('Y-m-d H:i:s');
 		}
 
 		$this->hook_before_add($this->arr);
 
-		$this->arr[$this->primary_key] = $id = CRUDBooster::newId($this->table);
-		// $this->arr=array_filter($this->arr); // null array fix = failed
+		$this->arr[$this->primary_key] = $id = CRUDBooster::newId($this->table);		
 		DB::table($this->table)->insert($this->arr);		
-
 
 		//Looping Data Input Again After Insert
 		foreach($this->data_inputan as $ro) {
@@ -1120,13 +1129,12 @@ class CBController extends Controller {
 		$this->validation();
 		$this->input_assignment($id);				
 
-		if (CRUDBooster::isColumnExists($this->table, 'updated_at'))
+		if (Schema::hasColumn($this->table, 'updated_at'))
 		{
 		    $this->arr['updated_at'] = date('Y-m-d H:i:s');
 		}
 
 		$this->hook_before_edit($this->arr,$id);
-		//$this->arr=array_filter($this->arr); // null array fix 
 		$this->wrapCustomWhere(DB::table($this->table)->where($this->primary_key,$id))->update($this->arr);		
 
 		//Looping Data Input Again After Insert

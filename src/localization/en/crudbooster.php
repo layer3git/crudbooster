@@ -12,6 +12,7 @@ return [
     'label_button_profile'       => "Profile",
     'filter_dialog_title'        => 'Advanced Sort & Filter',
     'there_is_no_option'        => 'There is no any options setting for this inputType',
+    'no'                          => 'No.',
 
     'text_enter_the_password'     => 'Enter your password to retrieve your session',
     'text_or_sign_in'             => 'Or sign in as a different user',
@@ -245,4 +246,10 @@ return [
     'privileges_module_list_update' =>'Update',
     'privileges_module_list_delete' =>'Delete',
 
+    //datamodal 
+    'datamodal_select'=>'Select',
+    'datamodal_search_and_enter'=>'Search and enter...',
+    'datamodal_enter_to_search'=>'Enter to search',
+    'datamodal_browse_data'=>'Browse Data' ,
+    
 ];

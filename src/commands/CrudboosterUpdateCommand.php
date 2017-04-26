@@ -87,7 +87,11 @@ class CrudboosterUpdateCommand extends Command {
 		$this->callSilent('vendor:publish',['--tag'=>'cb_localization','--force'=>true]);				  
 		
 		$this->info('Updating database...');
-		$this->callSilent('migrate',['--seed'=>true]);
+		$this->callSilent('migrate');
+		$this->callSilent('db:seed',['--class' => 'CBSeeder']);
+		
+		$this->info('Clearing Cache...');
+		Cache::flush();
 
 		$this->info('Clearing config cache...');
 		$this->call('config:clear');	

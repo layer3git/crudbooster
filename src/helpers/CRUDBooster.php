@@ -632,12 +632,8 @@ class CRUDBooster  {
 			}			
 		}
 
-		public static function flushCache($section) {
-			if(Cache::forget($section)) {
-				return true;
-			}else{
-				return false;
-			}
+		public static function flushCache() {
+			Cache::flush();
 		}
 
 		public static function forgetCache($section,$cache_name) {
@@ -869,7 +865,7 @@ class CRUDBooster  {
 	            $user_agent = Request::header('User-Agent');
 	            $time       = Request::header('X-Authorization-Time'); 
 
-	            $keys = DB::table('cms_apikey')->where('status','active')->lists('screetkey');
+	            $keys = DB::table('cms_apikey')->where('status','active')->pluck('screetkey');
 	            $server_token = array();
 	            $server_token_screet = array();
 	            foreach($keys as $key) {
@@ -1102,6 +1098,7 @@ class CRUDBooster  {
 			$this->title_field         = "'.$name_col.'";
 			$this->limit               = 20;
 			$this->orderby             = "id,desc";
+			$this->show_numbering      = FALSE;
 			$this->global_privilege    = '.$global_privilege.';	        
 			$this->button_table_action = '.$button_table_action.';   
 			$this->button_action_style = "'.$button_action_style.'";     
