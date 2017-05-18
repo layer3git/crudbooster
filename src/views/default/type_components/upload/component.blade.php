@@ -4,8 +4,7 @@
 			<div class="{{$col_width?:'col-sm-10'}}">
 			@if($value)
 				<?php 
-					$file = str_replace('uploads/','',$value);
-					$is_temporary = (Request::get('temporary'))?:0;
+					$file = str_replace('uploads/','',$value);					
 					if(Storage::exists($file)):								
 						$url         = asset($value);
 						@$ext         = strtolower(end(explode('.',$value)));
@@ -22,7 +21,7 @@
 					endif; 
 				?>
 				@if(!$readonly || !$disabled)
-				<p><a class='btn btn-danger btn-delete btn-sm' onclick="if(!confirm('{{trans("crudbooster.delete_title_confirm")}}')) return false" href='{{url(CRUDBooster::mainpath("delete-image?image=".$value."&id=".$row->id."&column=".$name."&temporary=".$is_temporary))}}'><i class='fa fa-ban'></i> Delete </a></p>
+				<p><a class='btn btn-danger btn-delete btn-sm' onclick="if(!confirm('{{trans("crudbooster.delete_title_confirm")}}')) return false" href='{{url(CRUDBooster::mainpath("delete-image?image=".$value."&id=".$row->id."&column=".$name))}}'><i class='fa fa-ban'></i> {{trans('crudbooster.text_delete')}} </a></p>
 				@endif
 			@endif	
 			@if(!$value)

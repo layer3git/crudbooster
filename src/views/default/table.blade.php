@@ -1,3 +1,4 @@
+            @push('bottom')
             <script type="text/javascript">
                   $(document).ready(function() {                      
                       var $window = $(window);                      
@@ -40,7 +41,7 @@
                       })
                   });
                 </script>
-
+                @endpush
                                             
                   <form id='form-table' method='post' action='{{CRUDBooster::mainpath("action-selected")}}'>
                   <input type='hidden' name='button_name' value=''/>
@@ -181,6 +182,7 @@
 
 
             @if($columns)
+            @push('bottom')
             <script>
             $(function(){
               $('.btn-filter-data').click(function() {
@@ -290,6 +292,7 @@
  
             })
             </script>
+            
             <!-- MODAL FOR SORTING DATA-->
             <div class="modal fade" tabindex="-1" role="dialog" id='advanced_filter_modal'>
               <div class="modal-dialog modal-lg">
@@ -327,6 +330,7 @@
                               <option typeallow='all' {{ (CRUDBooster::getTypeFilter($col["field_with"]) == 'in')?"selected":"" }} value='in'>{{trans("crudbooster.filter_in")}}</option>
                               <option typeallow='all' {{ (CRUDBooster::getTypeFilter($col["field_with"]) == 'not in')?"selected":"" }} value='not in'>{{trans("crudbooster.filter_not_in")}}</option>
                               @if(in_array($col['type_data'],['date','time','datetime','int','integer','double','float','decimal','timestamp']))<option {{ (CRUDBooster::getTypeFilter($col["field_with"]) == 'between')?"selected":"" }} value='between'>{{trans("crudbooster.filter_between")}}</option>@endif                         
+                              <option {{ (CRUDBooster::getTypeFilter($col["field_with"]) == 'empty')?"selected":"" }} value='empty'>Empty ( or Null)</option>
                             </select>
                           </div><!--END COL_SM_4-->
 
@@ -507,5 +511,5 @@
                 <!-- /.modal-content -->
               </div>
             </div>
-
+            @endpush
             @endif

@@ -1,5 +1,6 @@
 @extends('crudbooster::admin_template')
 @section('content')	 
+            @push('bottom')
             <script src="{{asset('vendor/laravel-filemanager/js/lfm.js')}}"></script>
             <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
             <script>
@@ -48,6 +49,7 @@
                 tinymce.init(editor_config);
 
               </script>
+              @endpush
 
               <div style="width:750px;margin:0 auto ">
                               
@@ -125,7 +127,7 @@
                                                 echo "<div class='help-block'>File support only doc,docx,xls,xlsx,ppt,pptx,pdf,zip,rar, Max 20 MB</div>";
                                                 break;
                                             case 'datepicker':
-                                                echo "<input type='text' class='datepicker form-control' name='$s->name'/>";
+                                                echo "<input type='text' class='datepicker form-control' name='$s->name' value='$value'/>";
                                                 break;
                                             case 'radio':
                                                 if($dataenum):

@@ -4,6 +4,7 @@ use Illuminate\Console\Command;
 use Illuminate\Foundation\Inspiring;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Process\Process;
 use DB;
 use Cache;
 use Request;
@@ -54,12 +55,16 @@ class CrudboosterUpdateCommand extends Command {
 
         //Create symlink for uploads path
         $this->info('Checking public/uploads directory...');
-        if(file_exists(public_path('uploads'))) {          
-            if(readlink(public_path('uploads')) == public_path('uploads')) {                                                                      
-            	$this->info('Removing public/uploads directory & create a symlink...');
+        if(file_exists(public_path('uploads'))) {  
+        	$this->info('Uploads directory is exists');
+        	$uploadPath = public_path('uploads');
+        	$this->info('Upload Path: '.$uploadPath);  
+        	
+        	if(realpath($uploadPath) == $uploadPath) {        	  
+	            $this->info('Removing public/uploads directory & create a symlink...');
                 rrmdir(public_path('uploads'));
-                app('files')->link(storage_path('app'), public_path('uploads'));
-            }              
+                app('files')->link(storage_path('app'), public_path('uploads'));   
+            }           
         }else{
         	$this->info('Creating a symlink for public/uploads directory...');
             app('files')->link(storage_path('app'), public_path('uploads'));
@@ -68,13 +73,15 @@ class CrudboosterUpdateCommand extends Command {
 
         //Crate symlink for assets
         $this->info('Checking public/vendor/crudbooster directory...');
-        if(file_exists(public_path('vendor'.DIRECTORY_SEPARATOR.'crudbooster'))) {                      
-            if(readlink(public_path('vendor'.DIRECTORY_SEPARATOR.'crudbooster')) == public_path('vendor'.DIRECTORY_SEPARATOR.'crudbooster')) {                
-                //Is Directory         
-                $this->info('Clear existing public/vendor/crudbooster instead of create a symlink...');                                      
+        if(file_exists(public_path('vendor'.DIRECTORY_SEPARATOR.'crudbooster'))) { 
+
+            $vendorpath = public_path('vendor'.DIRECTORY_SEPARATOR.'crudbooster');            
+            
+            if(realpath($vendorpath) == $vendorpath) {                     	
+	           $this->info('Clear existing public/vendor/crudbooster, and create a symlink for it...');                                  
                 rrmdir(public_path('vendor'.DIRECTORY_SEPARATOR.'crudbooster'));
-                app('files')->link(__DIR__.'/../assets',public_path('vendor/crudbooster'));
-            }            
+                app('files')->link(__DIR__.'/../assets',public_path('vendor/crudbooster'));     
+            }        
         }else{            
         	$this->info('Creating a public/vendor/crudbooster symlink...');  
             app('files')->link(__DIR__.'/../assets',public_path('vendor/crudbooster'));
@@ -86,8 +93,17 @@ class CrudboosterUpdateCommand extends Command {
 		$this->callSilent('vendor:publish',['--tag'=>'cb_lfm','--force'=>true]);	
 		$this->callSilent('vendor:publish',['--tag'=>'cb_localization','--force'=>true]);				  
 		
-		$this->info('Updating database...');
-		$this->callSilent('migrate');
+		$this->info('Dumping the autoloaded files and reloading all new files...');
+		$composer = $this->findComposer();
+        $process = new Process($composer.' dumpautoload');
+        $process->setWorkingDirectory(base_path())->run();
+
+		$this->info('Migrating database...');				
+		$this->call('migrate');
+
+		if (!class_exists('CBSeeder')) {
+            require_once __DIR__.'/../database/seeds/CBSeeder.php';
+        }
 		$this->callSilent('db:seed',['--class' => 'CBSeeder']);
 		
 		$this->info('Clearing Cache...');
@@ -209,5 +225,18 @@ class CrudboosterUpdateCommand extends Command {
 		}
 		$this->info('--');
 	}
+
+	/**
+     * Get the composer command for the environment.
+     *
+     * @return string
+     */
+    protected function findComposer()
+    {
+        if (file_exists(getcwd().'/composer.phar')) {
+            return '"'.PHP_BINARY.'" '.getcwd().'/composer.phar';
+        }
+        return 'composer';
+    }
 
 }
